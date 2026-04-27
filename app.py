@@ -53,24 +53,22 @@ def extract_features(text):
 # ==============================
 # SMART SCORING (ML-LIKE LOGIC)
 # ==============================
-
 def predict_rating(features):
     abstract_length, title_length, venue_length, log_citation, recency = features[0]
 
+    # Better balanced scoring
     score = (
-        abstract_length * 0.01 +
-        title_length * 0.2 +
-        venue_length * 1.5 +
-        log_citation * 2.5 +
-        recency * 0.1
+        min(abstract_length / 1000, 5) +   # cap long papers
+        title_length * 0.1 +
+        venue_length * 1.0 +
+        log_citation * 2.0 +
+        recency * 0.05
     )
 
-    # normalize to 1–10
-    rating = min(10, max(1, score / 5))
+    # Normalize to 1–10 properly
+    rating = np.clip(score, 1, 10)
 
     return round(rating, 2)
-
-
 def verdict(rating):
     if rating >= 8:
         return "Highly Recommended ✅"
